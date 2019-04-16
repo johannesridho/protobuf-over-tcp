@@ -6,6 +6,7 @@ import (
 	"log"
 	"net"
 	"os"
+	"time"
 )
 
 func main() {
@@ -37,7 +38,7 @@ func handleConn(conn net.Conn) {
 
 	defer conn.Close()
 
-	messageProto := message.Message{Text: "Hello World"}
+	messageProto := message.Message{Text: "Hello World", Timestamp: time.Now().Unix()}
 	data, err := proto.Marshal(&messageProto)
 	checkError(err)
 
@@ -59,11 +60,11 @@ func startClient() {
 	length, err := conn.Read(data)
 	checkError(err)
 
-	messageProto := message.Message{}
-	err = proto.Unmarshal(data[:length], &messageProto)
+	messagePb := message.Message{}
+	err = proto.Unmarshal(data[:length], &messagePb)
 	checkError(err)
 
-	log.Printf("received message : %s", messageProto.Text)
+	log.Printf("received message: %s, timestamp: %v", messagePb.Text, messagePb.Timestamp)
 }
 
 func checkError(err error) {
